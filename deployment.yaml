@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sshd
+  labels:
+    app: sshd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sshd
+  template:
+    metadata:
+      labels:
+        app: sshd
+    spec:
+      containers:
+      - name: sshd
+        image: panubo/sshd
+        ports:
+        - containerPort: 22
+        env:
+        - name: SSH_USERS
+          value: "dude:1000:1000"
+        - name: SFTP_MODE
+          value: "false"
+        volumeMounts:
+        - name: sshd-data
+          mountPath: /etc/authorized_keys/
+          subPath: authorized_keys
+      volumes:
+        - name: sshd-data
+          persistentVolumeClaim:
+            claimName: sshd-data
